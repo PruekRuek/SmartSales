@@ -15,9 +15,10 @@
     </a>
 
     <!-- Card 2 -->
+    <a href="/clientseller" class="link">
     <button class="card">
       <img src="src/lib/images/sales_customer.png" alt="เช็คประวัติลูกค้า" class="icon" />
-      <p>เช็คประวัติลูกค้า</p>
+      <p>เซลล์ประจำลูกค้า</p>
     </button>
   </div>
 </main>
@@ -26,7 +27,6 @@
   /* ===== Layout ===== */
   .page {
     min-height: 100vh;
-    background: linear-gradient(to bottom right, #f9fafb, #e5e7eb); /* soft gradient */
     display: flex;
     justify-content: center;
     padding-top: 96px;
@@ -78,5 +78,9 @@
     color: #374151; /* slate-700 */
     margin: 0;
     text-align: center;
+  }
+
+  a{
+    text-decoration: none;
   }
 </style>

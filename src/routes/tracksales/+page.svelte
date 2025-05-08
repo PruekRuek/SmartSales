@@ -59,7 +59,6 @@
 
   .page {
     min-height: 100vh;
-    background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
     display: flex;
     justify-content: center;
     align-items: flex-start;

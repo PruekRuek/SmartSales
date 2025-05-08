@@ -18,7 +18,7 @@
     <ul>
         <li><a href="/home">Home</a></li>
         <li><a href="/clientlist">ClientList</a></li>
-        <li><a href="/history">History</a></li>
+        <li><a href="/status">Status</a></li>
         <div class="profile" on:click={() => showMenu = !showMenu}>
             <FontAwesomeIcon icon={faUser} class="profile-icon" />
             {#if showMenu}
@@ -27,7 +27,7 @@
                 <li><button on:click={logout}>Logout</button></li>
               </div>
             {/if}
-          </div>
+        </div>
     </ul>
 </nav>
 

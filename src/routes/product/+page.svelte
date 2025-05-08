@@ -12,11 +12,15 @@
         </div>
         
         <div class="object-grid">
-            <div class="object-card">
-                <img src="src/lib/images/product/laptop.png" alt="Laptop">
-                <div class="card-title">Laptop</div>
-                <div class="Available_count">Available : 10</div>
-            </div>
+            
+                <div class="object-card">
+                    <a href="information">
+                        <img src="src/lib/images/product/laptop.png" alt="Laptop">
+                        <div class="card-title">Laptop</div>
+                        <div class="Available_count">Available : 12</div>
+                    </a>
+                </div>
+            
             <div class="object-card">
                 <img src="src/lib/images/product/Wireless keyboard and mouse set.png" alt="Wireless keyboard">
                 <div class="card-title">Wireless keyboard and mouse</div>
@@ -151,6 +155,10 @@
     color: green;
     font-size: 12px;
     font-family: "Cascadia Code", sans-serif;
+}
+
+a{
+    text-decoration: none;
 }
 
 </style>
