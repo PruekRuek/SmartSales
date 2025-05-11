@@ -16,6 +16,7 @@
 <nav>
     <img class="logo" src="/src/lib/images/logo.png" alt="Logo" />
     <ul>
+        <li><a href="/form">OrderProduct</a></li>
         <li><a href="/home">Home</a></li>
         <li><a href="/clientlist">ClientList</a></li>
         <li><a href="/status">Status</a></li>

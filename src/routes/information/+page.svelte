@@ -1,124 +1,133 @@
-<script>
-    import Menubar from '../../lib/component/menubar.svelte';
-  </script>
-  
-  <Menubar />
-  
-  <main>
-    <div class="product-container">
-      <!-- กล่องซ้าย: รูปภาพ + สต๊อก -->
-      <div class="image-section">
-        <div class="image-box">
-          <p>Img</p>
-          <p>สินค้าตัวอย่าง</p>
+<script lang="ts">
+  import Menubar from '../../lib/component/menubar.svelte';
+  import { onMount, tick } from 'svelte';
+  import { page } from '$app/stores';
+  import { get } from 'svelte/store';
+
+  let product: any = null;
+  let pdfContentRef: HTMLElement;
+  let isGeneratingPDF = false;
+
+  onMount(async () => {
+    const productId = get(page).url.searchParams.get('id');
+    if (!productId) return;
+
+    const res = await fetch(`https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/product`);
+    if (res.ok) {
+      const data = await res.json();
+      product = data.find((p: any) => p.productId === productId);
+    }
+  });
+
+  async function exportPDF() {
+    isGeneratingPDF = true;
+    await tick(); // รอ DOM อัปเดตซ่อนรูปภาพ
+    // @ts-ignore: html2pdf มาจาก CDN
+    html2pdf().from(pdfContentRef).set({
+      filename: `${product?.name || 'product'}.pdf`,
+      html2canvas: { useCORS: true, scale: 2 }
+    }).save().then(() => {
+      isGeneratingPDF = false;
+    });
+  }
+</script>
+
+<Menubar />
+
+<main>
+  {#if product}
+    <div class="product-container" bind:this={pdfContentRef}>
+      
+      {#if !isGeneratingPDF}
+        <!-- แสดงเฉพาะบนเว็บ -->
+        <div class="image-section">
+          <div class="image-box">
+            <img src={product.imageUrl} alt={product.name} class="product-image" />
+          </div>
         </div>
-        <p class="stock-text">stock: 12</p>
-      </div>
-  
-      <!-- กล่องขวา: รายละเอียด -->
+      {/if}
+
       <div class="detail-section">
-        <h1 class="product-name">ชื่อสินค้า</h1>
-        <p class="product-price">1000 Baht</p>
-        <p class="product-description">รายละเอียดสินค้าแบบย่อ เช่น สเปค หรือคุณสมบัติ</p>
+        <h1 class="product-name">{product.name}</h1>
+        <p class="product-price">{product.price} Baht</p>
+        <p class="stock-text">Stock: {product.quantity}</p>
+        <p class="product-description">model: {product.info?.model || 'ไม่มีข้อมูลเพิ่มเติม'}</p>
+        <p class="product-description">type: {product.info?.type || 'ไม่มีข้อมูลเพิ่มเติม'}</p>
+        <p class="product-description">warranty: {product.info?.warranty || 'ไม่มีข้อมูลเพิ่มเติม'}</p>
       </div>
     </div>
-  
-    <!-- ตารางข้อมูล -->
-    <div class="table-section">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>อื่น ๆ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>001</td>
-            <td>สินค้า A</td>
-            <td>-</td>
-          </tr>
-          <tr>
-            <td>002</td>
-            <td>สินค้า B</td>
-            <td>-</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </main>
-  
-  <style>
-    main {
-      background-color: #faf5f2;
-      padding: 20px;
-      font-family: sans-serif;
-    }
-  
-    .product-container {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 40px;
-    }
-  
-    .image-section {
-      width: 30%;
-    }
-  
-    .image-box {
-      width: 100%;
-      height: 200px;
-      background-color: #ddd;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      border: 1px solid #aaa;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-  
-    .stock-text {
-      font-size: 14px;
-      color: #444;
-    }
-  
-    .detail-section {
-      flex: 1;
-    }
-  
-    .product-name {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-  
-    .product-price {
-      color: green;
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-  
-    .product-description {
-      font-size: 14px;
-      color: #555;
-    }
-  
-    .table-section table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-  
-    .table-section th,
-    .table-section td {
-      border: 1px solid #999;
-      padding: 8px;
-      text-align: left;
-    }
-  
-    .table-section th {
-      background-color: #eee;
-    }
-  </style>
-  
+
+    <button class="pdf-button" on:click={exportPDF}>ดาวน์โหลด PDF</button>
+  {:else}
+    <p>Loading product...</p>
+  {/if}
+</main>
+
+<style>
+  main {
+    padding: 20px;
+    font-family: 'Cascadia Code', sans-serif;
+  }
+
+  .product-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .image-section {
+    width: 30%;
+  }
+
+  .image-box {
+    width: 100%;
+    height: 200px;
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .detail-section {
+    flex: 1;
+  }
+
+  .product-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .product-price {
+    color: green;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .product-description,
+  .stock-text {
+    font-size: 14px;
+    color: #555;
+  }
+
+  .pdf-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+</style>
