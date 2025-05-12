@@ -6,17 +6,37 @@
 
   let products: any[] = [];
   let filtered: any[] = [];
+  let searchTerm: string = '';
 
+  // ฟังก์ชันสำหรับการดึงข้อมูล
   onMount(async () => {
     const res = await fetch('https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/products');
     const data = await res.json();
     products = data;
 
     const categoryId = get(page).url.searchParams.get('category');
-    filtered = categoryId
-      ? products.filter(p => p.categoryId === categoryId)
-      : products;
+    filterProducts(categoryId, searchTerm);
   });
+
+  // ฟังก์ชันกรองข้อมูลทั้งจาก category และ search term
+  function filterProducts(categoryId: string | null, search: string) {
+    let temp = categoryId
+      ? products.filter(p => p.categoryId === categoryId)
+      : [...products];
+
+    if (search.trim() !== '') {
+      const lowerSearch = search.toLowerCase();
+      temp = temp.filter(p =>
+        p.name.toLowerCase().includes(lowerSearch) ||
+        p.productId.toLowerCase().includes(lowerSearch)
+      );
+    }
+
+    filtered = temp;
+  }
+
+  // เรียกทุกครั้งที่ searchTerm เปลี่ยน
+  $: filterProducts(get(page).url.searchParams.get('category'), searchTerm);
 </script>
 
 <Menubar />
@@ -25,7 +45,7 @@
   <div class="content">
     <div class="search-section">
       <div class="search-bar">
-        <input type="text" placeholder="Search" />
+        <input type="text" placeholder="Search" bind:value={searchTerm} />
       </div>
     </div>
 
