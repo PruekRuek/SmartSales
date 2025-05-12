@@ -29,6 +29,7 @@
             <span class="label">ที่อยู่:</span>
             <span>123/45 หมู่บ้านตัวอย่าง แขวงบางนา เขตบางนา กรุงเทพฯ</span>
           </p>
+          <h5>ผู้ดูแล : สมชาย</h5>
         </div>
       </div>
 
@@ -59,7 +60,6 @@
 
   .page {
     min-height: 100vh;
-    background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
     display: flex;
     justify-content: center;
     align-items: flex-start;

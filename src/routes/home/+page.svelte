@@ -8,19 +8,19 @@
         <div class="category-grid">
 
             <div class="category-card">
-                <a href="/product" >
+                <a href="/product?category=ELECTRONIC">
                 <img src="src/lib/images/product/Electronics.png" alt="Electronics">
                 <div class="card-title">Electronics</div></a>
             </div>
 
             <div class="category-card">
-                <a href="/product">
+                <a href="/product?category=ELECTRICAL_APPLIANCE">
                 <img src="src/lib/images/product/Electrical Appliances.png" alt="Electrical Appliances">
                 <div class="card-title">Electrical Appliances</div></a>
             </div>
 
             <div class="category-card">
-                <a href="/product" >
+                <a href="/product?category=CONSTRUCTION_MATERIAL">
                 <img src="src/lib/images/product/Construction Materials.png" alt="Construction Materials">
                 <div class="card-title">Construction Materials</div></a>
             </div>

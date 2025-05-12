@@ -20,29 +20,30 @@
                 <tr>
                 <th on:click={sortTable('ID')}>ID <span class="sort-arrow" id="arrowID">⇅</span></th>
                 <th on:click={sortTable('name')}>Name <span class="sort-arrow" id="arrowUsername">⇅</span></th>
-                <th on:click={sortTable('email')}>Email <span class="sort-arrow" id="arrowEmail">⇅</span></th>
+                <th on:click={sortTable('email')}>Address <span class="sort-arrow" id="arrowEmail">⇅</span></th>
                 <th on:click={sortTable('phone')}>Phone <span class="sort-arrow" id="arrowPhone">⇅</span></th>
-                <th on:click={sortTable('client')}>Client <span class="sort-arrow" id="arrowClient">⇅</span></th>
+                <th on:click={sortTable('status')}>Status <span class="sort-arrow" id="arrowClient">⇅</span></th>
+                <th on:click={sortTable('Order date')}>Order date <span class="sort-arrow" id="arrowClient">⇅</span></th>
                 </tr>
             </thead>
             <tbody id="SalesmanData">
                 <tr>
-                  <td>1</td><td>Miss Faii</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
+                  <td>1</td><td>Miss Faii</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
                 <tr>
-                  <td>2</td><td>Mr. Pruek</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
+                  <td>2</td><td>Mr. Pruek</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
                 <tr>
-                  <td>3</td><td>Miss Smile</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
+                  <td>3</td><td>Miss Smile</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
                 <tr>
-                  <td>4</td><td>Miss Plakaow</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
+                  <td>4</td><td>Miss Plakaow</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
                 <tr>
-                  <td>5</td><td>Mr. Teamthai Noisuwanna</td><td>Teamthai.noi@dome.tu.ac.th</td><td>08x-xxx-xxxx</td><td>-</td>
+                  <td>5</td><td>Mr. Teamthai Noisuwanna</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
                 <tr>
-                    <td>5</td><td>Miss Grace</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
+                    <td>5</td><td>Miss Grace</td><td>-</td><td>08x-xxx-xxxx</td><td>-</td><td>-</td>
                 </tr>
               </tbody>
               
