@@ -1,54 +1,93 @@
 <script lang="ts">
-    import Menubar from '../../lib/component/menubar.svelte';
+  import Menubar from '../../lib/component/menubar.svelte';
+  import { onMount } from 'svelte';
 
+  // ข้อมูลต้นฉบับ
+  const originalData: [string, string, string, string, string][] = [
+    ["1", "Miss Faii", "xxx@gmail.com", "08x-xxx-xxxx", "-"],
+    ["2", "Mr. Pruek", "xxx@gmail.com", "08x-xxx-xxxx", "-"],
+    ["3", "Miss Smile", "xxx@gmail.com", "08x-xxx-xxxx", "-"],
+    ["4", "Miss Plakaow", "xxx@gmail.com", "08x-xxx-xxxx", "-"],
+    ["5", "Mr. Teamthai Noisuwanna", "Teamthai.noi@dome.tu.ac.th", "08x-xxx-xxxx", "-"],
+    ["6", "Miss Grace", "xxx@gmail.com", "08x-xxx-xxxx", "-"],
+  ];
+
+  let searchTerm = '';
+  let sortColumn = '';
+  let sortOrder: 'asc' | 'desc' = 'asc';
+
+  // ฟังก์ชันสลับลำดับ
+  function sortTable(column: string) {
+    if (sortColumn === column) {
+      sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortColumn = column;
+      sortOrder = 'asc';
+    }
+  }
+
+  // สร้างข้อมูลที่ผ่านการ filter + sort
+  $: filteredData = originalData
+    .filter(row => row.join(' ').toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      if (!sortColumn) return 0;
+      const columnIndex = {
+        ID: 0,
+        name: 1,
+        email: 2,
+        phone: 3,
+        client: 4
+      }[sortColumn];
+      const valA = a[columnIndex];
+      const valB = b[columnIndex];
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+  function getArrow(col: string) {
+    if (sortColumn !== col) return '⇅';
+    return sortOrder === 'asc' ? '↑' : '↓';
+  }
 </script>
 
 <Menubar />
-    <main class="main-content">
+<main class="main-content">
+  <div class="content">
+    <div class="filters">
+      <div class="search-sorting">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          bind:value={searchTerm}
+          placeholder="Search"
+        />
+      </div>
+    </div>
 
-        <!-- ------------Content----------- -->
-        <div class="content">
-            
-            <div class="filters">
-                <div class="search-sorting">
-                    <i class="fa-solid fa-magnifying-glass"></i><input type="text" id="searchInput" placeholder="Search" on:input={fetchData()}>
-                </div>
-            </div>
-            
-            <table>
-            <thead>
-                <tr>
-                <th on:click={sortTable('ID')}>ID <span class="sort-arrow" id="arrowID">⇅</span></th>
-                <th on:click={sortTable('name')}>Name <span class="sort-arrow" id="arrowUsername">⇅</span></th>
-                <th on:click={sortTable('email')}>Email <span class="sort-arrow" id="arrowEmail">⇅</span></th>
-                <th on:click={sortTable('phone')}>Phone <span class="sort-arrow" id="arrowPhone">⇅</span></th>
-                <th on:click={sortTable('client')}>Client <span class="sort-arrow" id="arrowClient">⇅</span></th>
-                </tr>
-            </thead>
-            <tbody id="SalesmanData">
-                <tr>
-                  <td>1</td><td>Miss Faii</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-                <tr>
-                  <td>2</td><td>Mr. Pruek</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-                <tr>
-                  <td>3</td><td>Miss Smile</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-                <tr>
-                  <td>4</td><td>Miss Plakaow</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-                <tr>
-                  <td>5</td><td>Mr. Teamthai Noisuwanna</td><td>Teamthai.noi@dome.tu.ac.th</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-                <tr>
-                    <td>5</td><td>Miss Grace</td><td>xxx@gmail.com</td><td>08x-xxx-xxxx</td><td>-</td>
-                </tr>
-              </tbody>
-              
-            </table>
-        </div>
-    </main>
+    <table>
+      <thead>
+        <tr>
+          <th on:click={() => sortTable('ID')}>ID <span class="sort-arrow">{getArrow('ID')}</span></th>
+          <th on:click={() => sortTable('name')}>Name <span class="sort-arrow">{getArrow('name')}</span></th>
+          <th on:click={() => sortTable('email')}>Email <span class="sort-arrow">{getArrow('email')}</span></th>
+          <th on:click={() => sortTable('phone')}>Phone <span class="sort-arrow">{getArrow('phone')}</span></th>
+          <th on:click={() => sortTable('client')}>Client <span class="sort-arrow">{getArrow('client')}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each filteredData as row}
+          <tr>
+            {#each row as cell}
+              <td>{cell}</td>
+            {/each}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
+</main>
+
    
  <style>
      @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
