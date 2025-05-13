@@ -1,9 +1,12 @@
-<script>
+<script lang="ts">
     import Menubar from '../../lib/component/menubar.svelte';
     import boy1 from '../../lib/images/seller/boy2.PNG'
     import girl1 from '../../lib/images/seller/girl1.PNG'
     import girl2 from '../../lib/images/seller/girl2.PNG'
 
+    import { get } from 'svelte/store';
+
+    let searchTerm = '';
     let selectedSeller = null;
 
     const sellers = [
@@ -32,17 +35,31 @@
             image: girl1
         }
     ];
+
+    let filtered = sellers;
+    function filterSellers(search: string) {
+        const lowerSearch = search.toLowerCase().trim();;
+
+        filtered = lowerSearch
+            ? sellers.filter(seller =>
+                `${seller.firstName} ${seller.lastName}`.toLowerCase().includes(lowerSearch)
+            )
+        : sellers;
+    }
+
+  // เรียกทุกครั้งที่ searchTerm เปลี่ยน
+  $: filterSellers(searchTerm)
 </script>
 
 <Menubar />
 
 <!-- Search Bar -->
-<div class="search-bar">
-    <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search name here" />
+    <div class="filters">
+        <div class="search-sorting">
+            <input type="text" id="searchInput" placeholder="Search" bind:value={searchTerm}>
+        </div>
     </div>
-</div>
+
 
 <main class="main-content">
     <div class="content">
@@ -50,7 +67,7 @@
         <section class="seller-section">
             <h2 class="section-title">Seller</h2>
             <div class="seller-list">
-                {#each sellers as seller}
+                {#each filtered as seller}
                     <div class="seller-box" on:click={() => selectedSeller = seller}>
                         <div class="seller-image-wrapper">
                             <img src={seller.image} alt="seller cartoon" class="seller-image" />
@@ -90,34 +107,31 @@
 
     /* Search Bar */
     
-    .search-bar {
+    .filters {
         display: flex;
         justify-content: flex-end;
         padding: 20px 60px 0 30px;
         margin-top: 30px;
     }
 
-    .search-input-wrapper {
-        position: relative;
-        width: 340px;
+    .search-sorting {
+        height: 15px;
+        display: flex;
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: 1px solid rgb(100, 100, 100);
+        align-items: center;
+        background: white;
+        box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.158);
     }
 
-    .search-icon {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        color: #888;
-    }
-
-    .search-input-wrapper input {
-        width: 100%;
-        padding: 12px 16px 12px 36px;
-        font-size: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
+    .search-sorting input {
+        width: 20vw;
+        padding-left: 7%;
+        outline: none;
+        border: none;
+        font-weight: 700;
+        background: transparent;
     }
 
     /* Seller Section */
