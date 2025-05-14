@@ -1,54 +1,18 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Menubar from '../../lib/component/menubar.svelte';
-    import boy1 from '../../lib/images/seller/boy2.PNG'
-    import girl1 from '../../lib/images/seller/girl1.PNG'
-    import girl2 from '../../lib/images/seller/girl2.PNG'
 
-    import { get } from 'svelte/store';
-
-    let searchTerm = '';
     let selectedSeller = null;
+    let users: { name: string; email: string; phone: string }[] = [];
 
-    const sellers = [
-        {
-            firstName: "สมชาย",
-            lastName: "ใจดี",
-            position: "พนักงานขาย",
-            phone: "098-765-4321",
-            email: "somchai@example.com",
-            image: boy1
-        },
-        {
-            firstName: "สมหญิง",
-            lastName: "ตั้งใจดี",
-            position: "พนักงานขาย",
-            phone: "092-345-6789",
-            email: "somying@example.com",
-            image: girl2
-        },
-        {
-            firstName: "เจนจิรา",
-            lastName: "หวังดี",
-            position: "พนักงานขาย",
-            phone: "089-123-4567",
-            email: "jenjira@example.com",
-            image: girl1
+    onMount(async () => {
+        try {
+            const res = await fetch("https://80u4b8s9gk.execute-api.us-east-1.amazonaws.com/Seller");
+            users = await res.json();
+        } catch (err) {
+            console.error("❌ Failed to fetch users:", err);
         }
-    ];
-
-    let filtered = sellers;
-    function filterSellers(search: string) {
-        const lowerSearch = search.toLowerCase().trim();;
-
-        filtered = lowerSearch
-            ? sellers.filter(seller =>
-                `${seller.firstName} ${seller.lastName}`.toLowerCase().includes(lowerSearch)
-            )
-        : sellers;
-    }
-
-  // เรียกทุกครั้งที่ searchTerm เปลี่ยน
-  $: filterSellers(searchTerm)
+    });
 </script>
 
 <Menubar />
@@ -67,21 +31,16 @@
         <section class="seller-section">
             <h2 class="section-title">Seller</h2>
             <div class="seller-list">
-                {#each filtered as seller}
+                {#each users as seller}
                     <div class="seller-box" on:click={() => selectedSeller = seller}>
-                        <div class="seller-image-wrapper">
-                            <img src={seller.image} alt="seller cartoon" class="seller-image" />
-                        </div>
                         <div class="seller-info">
-                            <h3 class="seller-name">{seller.firstName} {seller.lastName}</h3>
-                            <p class="seller-position">{seller.position}</p>
+                            <h3 class="seller-name">{seller.name}</h3>
                             <p class="seller-phone">📞 {seller.phone}</p>
                             <p class="seller-email">📧 {seller.email}</p>
                         </div>
                         <button class="view-customers-btn" on:click={() => window.location.href = '/customers'}>
                             ลูกค้าที่ดูแล
                         </button>
-                        
                     </div>
                 {/each}
             </div>
@@ -105,9 +64,7 @@
         padding: 60px;
     }
 
-    /* Search Bar */
-    
-    .filters {
+    .search-bar {
         display: flex;
         justify-content: flex-end;
         padding: 20px 60px 0 30px;
@@ -134,7 +91,6 @@
         background: transparent;
     }
 
-    /* Seller Section */
     .seller-section {
         margin-top: 20px;
     }
@@ -145,7 +101,7 @@
         color: #333;
         margin-bottom: 60px;
         margin-top: -10px;
-        text-align: left; 
+        text-align: left;
         border-left: 6px solid #4CAF50;
         padding-left: 12px;
     }
@@ -175,21 +131,6 @@
     .seller-box:hover {
         transform: translateY(-6px);
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .seller-image-wrapper {
-        width: 120px;
-        height: 120px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .seller-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
     }
 
     .seller-info {
