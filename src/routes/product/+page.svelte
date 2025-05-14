@@ -44,10 +44,15 @@
 <main class="main-content">
   <div class="content">
     <div class="search-section">
-      <div class="search-bar">
-        <input type="text" placeholder="Search" bind:value={searchTerm} />
+      <div class="search-sorting">
+        <input
+          type="text"
+          placeholder="Search"
+          bind:value={searchTerm}
+        />
       </div>
     </div>
+  
 
     <div class="object-grid">
       {#each filtered as product}
@@ -84,21 +89,39 @@
 
   .search-section {
     display: flex;
-    justify-content: right;
-    margin-bottom: 20px;
-    padding: 10px;
-    font-family: 'Cascadia Code', sans-serif;
+    justify-content: flex-end;
+    padding-right: 5%;
+    margin-top: 20px;
+    margin-bottom: 50px;  
   }
 
-  .search-bar input {
-    width: 450px;
+  .search-sorting {
+    height: 15px;
+    display: flex;
     padding: 10px 20px;
-    font-size: 20px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 30px;
+    border: 1px solid rgb(100, 100, 100);
+    align-items: center;
+    background: white;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.158);
+  }
+
+  .search-sorting input {
+    width: 20vw;
+    padding-left: 7%;
     outline: none;
+    border: none;
+    font-weight: 700;
+    background: transparent;
     font-family: 'Cascadia Code', sans-serif;
+    font-size: 1rem;
+  }
+
+    .search-sorting input::placeholder {
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #999; /* ปรับสีได้ตามต้องการ */
   }
 
   .object-grid {

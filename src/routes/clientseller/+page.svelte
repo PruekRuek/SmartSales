@@ -18,12 +18,12 @@
 <Menubar />
 
 <!-- Search Bar -->
-<div class="search-bar">
-    <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search name here" />
+    <div class="filters">
+        <div class="search-sorting">
+            <input type="text" id="searchInput" placeholder="Search" bind:value={searchTerm}>
+        </div>
     </div>
-</div>
+
 
 <main class="main-content">
     <div class="content">
@@ -71,27 +71,24 @@
         margin-top: 30px;
     }
 
-    .search-input-wrapper {
-        position: relative;
-        width: 340px;
+    .search-sorting {
+        height: 15px;
+        display: flex;
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: 1px solid rgb(100, 100, 100);
+        align-items: center;
+        background: white;
+        box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.158);
     }
 
-    .search-icon {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        color: #888;
-    }
-
-    .search-input-wrapper input {
-        width: 100%;
-        padding: 12px 16px 12px 36px;
-        font-size: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
+    .search-sorting input {
+        width: 20vw;
+        padding-left: 7%;
+        outline: none;
+        border: none;
+        font-weight: 700;
+        background: transparent;
     }
 
     .seller-section {

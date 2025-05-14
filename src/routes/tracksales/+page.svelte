@@ -10,9 +10,9 @@
 
     <!-- 🔍 Search -->
     <div class="search-box">
-      <span class="search-icon">🔍</span>
       <input type="text" placeholder="ค้นหาชื่อลูกค้า" />
     </div>
+
 
     <!-- 🛒 สินค้า -->
     <div class="product-card">
@@ -81,29 +81,30 @@
   .search-box {
     display: flex;
     width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1px solid #999;
+    border-radius: 9999px; /* ทำให้เป็น pill shape */
     background: white;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  }
-
-  .search-icon {
-    background: #f3f4f6;
-    padding: 8px 16px;
-    color: #6b7280;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    padding: 12px 24px;
   }
 
   .search-box input {
     flex: 1;
     border: none;
-    padding: 8px 16px;
-    font-size: 14px;
     outline: none;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif; /* หรือใช้ 'Cascadia Code', sans-serif */
+    background: transparent;
   }
+
+    .search-box input::placeholder {
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    color: #555;
+  }
+
+
 
   /* ===== Product Card ===== */
   .product-card {
