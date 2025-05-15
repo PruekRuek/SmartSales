@@ -47,7 +47,7 @@
       <div class="search-sorting">
         <input
           type="text"
-          placeholder="Search"
+          placeholder="ค้นหาสินค้า"
           bind:value={searchTerm}
         />
       </div>

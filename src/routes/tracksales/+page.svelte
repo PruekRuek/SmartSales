@@ -1,63 +1,55 @@
 <script lang="ts">
-  
   import Menubar from '../../lib/component/menubar.svelte';
+  import { onMount } from 'svelte';
+
+  let customerOrders: any[] = [];
+  let searchTerm: string = '';
+
+  onMount(async () => {
+    try {
+      const res = await fetch('https://yhnn87nc5l.execute-api.us-east-1.amazonaws.com/orders');
+      customerOrders = await res.json();
+    } catch (err) {
+      console.error("❌ Failed to fetch customer orders:", err);
+    }
+  });
 </script>
 
 <Menubar />
 
 <main class="page">
   <div class="container">
-
-    <!-- 🔍 Search -->
     <div class="search-box">
-      <input type="text" placeholder="ค้นหาชื่อลูกค้า" />
+      <input type="text" placeholder="ค้นหาชื่อลูกค้า" bind:value={searchTerm} />
     </div>
 
+    {#each customerOrders.filter(order => order.customerName.toLowerCase().includes(searchTerm.toLowerCase())) as order}
+      <div class="product-card">
+        <div class="product-layout">
+          <div class="product-info">
+            <h3 class="title">คำสั่งซื้อ</h3>
+            <p class="entry"><span class="label">ชื่อลูกค้า:</span> {order.customerName}</p>
+            <p class="entry"><span class="label">โทร:</span> {order.contact}</p>
+            <p class="entry"><span class="label">ที่อยู่:</span> {order.address}</p>
+            <p class="entry"><span class="label">ผู้ดูแล:</span> {order.staff}</p>
 
-    <!-- 🛒 สินค้า -->
-    <div class="product-card">
-      <div class="product-layout">
-        <img src="src/lib/images/camera.png" alt="สินค้า" />
-
-        <div class="product-info">
-          <h3>สินค้า 1</h3>
-          <h5>นายสุชาติ เสียของ</h5>
-          <p class="compacts">
-            <span class="label">โทร:</span>
-            <span>081–234–5678</span>
-          </p>
-          <p class="compact">
-            <span class="label">ที่อยู่:</span>
-            <span>123/45 หมู่บ้านตัวอย่าง แขวงบางนา เขตบางนา กรุงเทพฯ</span>
-          </p>
-          <h5>ผู้ดูแล : สมชาย</h5>
+            <div class="entry">
+              <span class="label">สินค้า:</span>
+              <ul>
+                {#each JSON.parse(order.products) as product}
+                  <li>{product.name} <span class="quantity">จำนวน {product.quantity}</span></li>
+                {/each}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- ✅ สถานะ timeline อยู่ล่างสุดของกล่อง -->
-      <div class="status-wrapper">
-        <div class="status">
-          <div class="step active">จอง</div>
-          <div class="line"></div>
-          <div class="step">ชำระแล้ว</div>
-          <div class="line"></div>
-          <div class="step">กำลังส่งของ</div>
-          <div class="line"></div>
-          <div class="step">ได้รับของแล้ว</div>
-        </div>
-      </div>
-    </div>
-
+    {/each}
   </div>
 </main>
 
 <style>
-   @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
-  .topbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 50;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
 
   .page {
     min-height: 100vh;
@@ -67,22 +59,22 @@
     padding-top: 128px;
     padding-left: 16px;
     padding-right: 16px;
+    background: #f8f3f0;
   }
 
   .container {
-    width: 45%;
+    width: 60%;
     display: flex;
     flex-direction: column;
     gap: 32px;
     align-items: center;
   }
 
-  /* ===== Search Box ===== */
   .search-box {
     display: flex;
     width: 100%;
     border: 1px solid #999;
-    border-radius: 9999px; /* ทำให้เป็น pill shape */
+    border-radius: 9999px;
     background: white;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
     padding: 12px 24px;
@@ -94,19 +86,10 @@
     outline: none;
     font-size: 16px;
     font-weight: bold;
-    font-family: 'Arial', sans-serif; /* หรือใช้ 'Cascadia Code', sans-serif */
+    font-family: 'Arial', sans-serif;
     background: transparent;
   }
 
-    .search-box input::placeholder {
-    font-weight: bold;
-    font-family: 'Arial', sans-serif;
-    color: #555;
-  }
-
-
-
-  /* ===== Product Card ===== */
   .product-card {
     background: white;
     border-radius: 16px;
@@ -114,93 +97,42 @@
     padding: 24px;
     width: 100%;
     transition: box-shadow 0.2s ease;
+    font-family: 'Cascadia Code', sans-serif;
   }
 
   .product-card:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.12);
   }
 
-  .product-layout {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-  }
-
-  .product-card img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 12px;
-  }
-
   .product-info {
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-
-  .product-info h3 {
-    font-size: 18px;
-    font-family: "Cascadia Code", sans-serif;
-    color: #374151;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  .product-info h5 {
-    font-size: 15px;
-    font-family: "Cascadia Code", sans-serif;
-    color: #111827;
-    font-weight: 500;
-    margin: 0;
-  }
-
-  /* ===== Status Timeline ===== */
-  .status-wrapper {
-    margin-top: 24px;
-  }
-
-  .status {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     font-size: 14px;
-    color: #6b7280;
+    line-height: 1.5;
+    color: #111827;
   }
 
-  .step {
-    white-space: nowrap;
-    font-weight: 500;
-  }
-
-  .step.active {
-    color: #dc2626;
+  .title {
+    font-size: 20px;
     font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
   }
 
-  .line {
-    flex: 1;
-    height: 2px;
-    background: #d1d5db;
-    margin: 0 8px;
+  .label {
+    font-weight: bold;
+    margin-right: 4px;
+    display: inline-block;
   }
-  .compact {
-  margin: -10px 0;
-  font-size: 13px;
-  line-height: 1.3;
-}
-  .compacts {
-  margin: 0px 0;
-  font-size: 13px;
-  line-height: 1.3;
-}
 
-.label {
-  display: inline;
-  font-weight: bold;
-  margin-right: 1px; /* ปรับตรงนี้ให้ชิดขึ้นหรือลดลงได้ */
-}
+  .entry {
+    font-size: 14px;
+    margin: 0;
+  }
 
-
+  .quantity {
+    font-weight: bold;
+    color: #374151;
+  }
 </style>

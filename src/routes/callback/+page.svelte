@@ -14,7 +14,8 @@
 				error = 'Login failed: No user returned from signinCallback';
 				return;
 			}
-
+			localStorage.setItem('user', JSON.stringify(user.profile));	
+			
 			console.log('User profile:', user.profile);
 			Name.set(user.profile?.name ?? 'No name');
 

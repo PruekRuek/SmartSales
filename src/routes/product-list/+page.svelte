@@ -8,7 +8,7 @@
   let products: any[] = [];
   let filtered: any[] = [];
   let searchTerm: string = '';
-  let selectedItems: { name: string; quantity: number }[] = [];
+  let selectedItems: { productId: string; name: string; quantity: number; categoryId: string }[] = [];
 
   onMount(async () => {
     const res = await fetch('https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/products');
@@ -43,13 +43,21 @@
   }
 
   function toggleProduct(name: string) {
-    const index = selectedItems.findIndex(item => item.name === name);
-    if (index !== -1) {
-      selectedItems.splice(index, 1);
-    } else {
-      selectedItems.push({ name, quantity: 1 });
+    const existingIndex = selectedItems.findIndex(item => item.name === name);
+    const productInfo = products.find(p => p.name === name);
+
+    if (existingIndex !== -1) {
+      selectedItems.splice(existingIndex, 1);
+    } else if (productInfo) {
+      selectedItems.push({
+        productId: productInfo.productId,
+        name: productInfo.name,
+        quantity: 1,
+        categoryId: productInfo.categoryId
+      });
     }
-    selectedItems = [...selectedItems]; // trigger reactivity
+
+    selectedItems = [...selectedItems];
     saveSelectedItems();
   }
 
@@ -64,23 +72,20 @@
 
   function increaseQuantity(name: string) {
     const product = selectedItems.find(p => p.name === name);
-    const productInfo = products.find(p => p.name === name); // หาข้อมูลสินค้าจาก stock
+    const productInfo = products.find(p => p.name === name);
 
-    if (product && productInfo) {
-        if (product.quantity < productInfo.quantity) {
-        product.quantity++;
-        selectedItems = [...selectedItems]; // trigger update
-        saveSelectedItems();
-        }
+    if (product && productInfo && product.quantity < productInfo.quantity) {
+      product.quantity++;
+      selectedItems = [...selectedItems];
+      saveSelectedItems();
     }
-    }
-
+  }
 
   function decreaseQuantity(name: string) {
     const product = selectedItems.find(p => p.name === name);
     if (product && product.quantity > 1) {
       product.quantity--;
-      selectedItems = [...selectedItems]; // trigger reactivity
+      selectedItems = [...selectedItems];
       saveSelectedItems();
     }
   }
@@ -88,13 +93,18 @@
   $: filterProducts(get(page).url.searchParams.get('category'), searchTerm);
 </script>
 
+
 <Menubar />
 
 <main class="main-content">
   <div class="content">
     <div class="search-section">
-      <div class="search-bar">
-        <input type="text" placeholder="Search" bind:value={searchTerm} />
+      <div class="search-sorting">
+        <input
+          type="text"
+          placeholder="ค้นหาสินค้า"
+          bind:value={searchTerm}
+        />
       </div>
     </div>
 
@@ -154,19 +164,39 @@
 
   .search-section {
     display: flex;
-    justify-content: right;
-    margin-bottom: 20px;
-    padding: 10px;
+    justify-content: flex-end;
+    padding-right: 5%;
+    margin-top: 20px;
+    margin-bottom: 50px;
   }
 
-  .search-bar input {
-    width: 450px;
+  .search-sorting {
+    height: 15px;
+    display: flex;
     padding: 10px 20px;
-    font-size: 20px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 30px;
+    border: 1px solid rgb(100, 100, 100);
+    align-items: center;
+    background: white;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.158);
+  }
+
+  .search-sorting input {
+    width: 20vw;
+    padding-left: 7%;
     outline: none;
+    border: none;
+    font-weight: 700;
+    background: transparent;
+    font-family: 'Cascadia Code', sans-serif;
+    font-size: 1rem;
+  }
+
+  .search-sorting input::placeholder {
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #999;
   }
 
   .object-grid {
