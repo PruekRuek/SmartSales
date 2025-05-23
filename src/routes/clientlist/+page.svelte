@@ -7,20 +7,32 @@
   let searchTerm: string = '';
   let staffName: string = '';
 
-    onMount(async () => {
+  function formatDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString('th-TH', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Bangkok',
+    });
+  }
+
+  onMount(async () => {
     try {
-        const user = await userManager.getUser();
-        if (user) {
+      const user = await userManager.getUser();
+      if (user) {
         staffName = user.profile.name ?? '';
         const res = await fetch('https://yhnn87nc5l.execute-api.us-east-1.amazonaws.com/orders');
         const allOrders = await res.json();
         customerOrders = allOrders.filter(order => order.staff === staffName);
-        }
+      }
     } catch (err) {
-        console.error("❌ Failed to fetch customer orders:", err);
+      console.error("❌ Failed to fetch customer orders:", err);
     }
-    });
-
+  });
 </script>
 
 <Menubar />
@@ -41,10 +53,21 @@
           <th>ที่อยู่</th>
           <th>เบอร์ติดต่อ</th>
           <th>สินค้า</th>
+          <th>รหัสการสั่งซื้อ</th>
+          <th>วันที่สั่งซื้อ</th>
         </tr>
       </thead>
-      <tbody>
-        {#each customerOrders.filter(order => order.customerName.toLowerCase().includes(searchTerm.toLowerCase())) as order, index}
+     <tbody>
+        {#each customerOrders
+          .slice()
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .filter(order => {
+            const term = searchTerm.toLowerCase();
+            return (
+              order.customerName.toLowerCase().includes(term) ||
+              order.orderId.toLowerCase().includes(term)
+            );
+          }) as order, index}
           <tr>
             <td>{index + 1}</td>
             <td>{order.customerName}</td>
@@ -57,12 +80,15 @@
                 {/each}
               </ul>
             </td>
+            <td>{order.orderId}</td>
+            <td>{formatDate(order.createdAt)}</td>
           </tr>
         {/each}
       </tbody>
     </table>
   </div>
 </main>
+
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
@@ -72,7 +98,6 @@
     display: flex;
     flex-direction: column;
     font-family: "Cascadia Code", sans-serif;
-    background: #f8f3f0;
     padding: 60px 20px;
   }
 

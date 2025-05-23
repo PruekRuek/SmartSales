@@ -28,7 +28,8 @@
       const lowerSearch = search.toLowerCase();
       temp = temp.filter(p =>
         p.name.toLowerCase().includes(lowerSearch) ||
-        p.productId.toLowerCase().includes(lowerSearch)
+        p.productId.toLowerCase().includes(lowerSearch) ||
+        (p.info?.type && p.info.type.toLowerCase().includes(lowerSearch)) // ✅ เปลี่ยนตรงนี้
       );
     }
 

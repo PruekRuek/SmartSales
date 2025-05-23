@@ -14,7 +14,6 @@
     const res = await fetch('https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/products');
     const data = await res.json();
     products = data;
-
     const categoryId = get(page).url.searchParams.get('category');
     filterProducts(categoryId, searchTerm);
 
@@ -35,7 +34,8 @@
       const lowerSearch = search.toLowerCase();
       temp = temp.filter(p =>
         p.name.toLowerCase().includes(lowerSearch) ||
-        p.productId.toLowerCase().includes(lowerSearch)
+        p.productId.toLowerCase().includes(lowerSearch) ||
+        (p.info?.type && p.info.type.toLowerCase().includes(lowerSearch)) // ✅ เปลี่ยนตรงนี้
       );
     }
 
@@ -90,6 +90,10 @@
     }
   }
 
+  function goToInfo(productId: string) {
+    goto(`/information?id=${productId}`);
+  }
+
   $: filterProducts(get(page).url.searchParams.get('category'), searchTerm);
 </script>
 
@@ -111,8 +115,8 @@
     <div class="object-grid">
       {#each filtered as product}
         <div class="object-card">
-          <img src={product.imageUrl} alt={product.name} />
-          <div class="card-title">{product.name}</div>
+          <img src={product.imageUrl} alt={product.name} on:click={() => goToInfo(product.productId)} style="cursor: pointer;" />
+          <div class="card-title" on:click={() => goToInfo(product.productId)} style="cursor: pointer;">{product.name}</div>
 
           <div class="Available_count {product.quantity === 0 ? 'out-of-stock' : 'in-stock'}">
             {product.quantity === 0 ? 'Out of Stock' : `Available: ${product.quantity}`}

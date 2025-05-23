@@ -126,13 +126,9 @@
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    cursor: pointer;
     transition: transform 0.2s ease;
   }
 
-  .seller-box:hover {
-    transform: translateY(-4px);
-  }
 
   .seller-info {
     display: flex;

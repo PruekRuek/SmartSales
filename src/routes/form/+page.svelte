@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { userManager } from '$lib/cognito/auth';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   let loggedInUserName = '';
   let customerName = '';
@@ -44,6 +45,26 @@
       address = data.address ?? '';
       localStorage.removeItem("formData");
     }
+
+    const productId = new URLSearchParams(window.location.search).get('id');
+    if (productId && !products.find(p => p.productId === productId)) {
+      const res = await fetch(`https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/product`);
+      if (res.ok) {
+        const data = await res.json();
+        const found = data.find((p: any) => p.productId === productId);
+        if (found) {
+          products = [
+            ...products,
+            {
+              productId: found.productId,
+              name: found.name,
+              quantity: 1,
+              categoryId: found.categoryId ?? ''
+            }
+          ];
+        }
+      }
+    }
   });
 
   function removeProduct(index: number) {
@@ -67,6 +88,7 @@
       contact,
       address
     }));
+    localStorage.setItem("selectedProducts", JSON.stringify(products));
     goto('/product-list');
   }
 
@@ -132,6 +154,8 @@
     }
   }
 </script>
+
+
 
 
 <Menubar />

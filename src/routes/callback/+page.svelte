@@ -16,7 +16,6 @@
 			}
 			localStorage.setItem('user', JSON.stringify(user.profile));	
 			
-			console.log('User profile:', user.profile);
 			Name.set(user.profile?.name ?? 'No name');
 
 			// ✅ ส่งข้อมูล user พร้อมเบอร์โทร
