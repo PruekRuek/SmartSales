@@ -3,13 +3,20 @@
   import { onMount } from 'svelte';
   import { userManager } from '$lib/cognito/auth';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   let loggedInUserName = '';
   let customerName = '';
   let contact = '';
   let address = '';
   let selectedStaff = '';
-  let products: { name: string; quantity: number }[] = [];
+  let products: { productId: string; name: string; quantity: number; categoryId: string }[] = [];
+  let errorMessage: string = '';
+
+  function showError(msg: string) {
+    errorMessage = msg;
+    setTimeout(() => errorMessage = '', 5000);
+  }
 
   onMount(async () => {
     const user = await userManager.getUser();
@@ -18,11 +25,45 @@
       selectedStaff = loggedInUserName;
     }
 
-    // ดึงสินค้าจาก localStorage
     const saved = localStorage.getItem("selectedProducts");
     if (saved) {
-      products = JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      products = parsed.map((p: any) => ({
+        productId: p.productId,
+        name: p.name,
+        quantity: p.quantity,
+        categoryId: p.categoryId ?? ''
+      }));
       localStorage.removeItem("selectedProducts");
+    }
+
+    const formSaved = localStorage.getItem("formData");
+    if (formSaved) {
+      const data = JSON.parse(formSaved);
+      customerName = data.customerName ?? '';
+      contact = data.contact ?? '';
+      address = data.address ?? '';
+      localStorage.removeItem("formData");
+    }
+
+    const productId = new URLSearchParams(window.location.search).get('id');
+    if (productId && !products.find(p => p.productId === productId)) {
+      const res = await fetch(`https://jn4h73y1ml.execute-api.us-east-1.amazonaws.com/product`);
+      if (res.ok) {
+        const data = await res.json();
+        const found = data.find((p: any) => p.productId === productId);
+        if (found) {
+          products = [
+            ...products,
+            {
+              productId: found.productId,
+              name: found.name,
+              quantity: 1,
+              categoryId: found.categoryId ?? ''
+            }
+          ];
+        }
+      }
     }
   });
 
@@ -30,7 +71,6 @@
     products = products.filter((_, i) => i !== index);
     localStorage.setItem("selectedProducts", JSON.stringify(products));
   }
-
 
   function increase(index: number) {
     products[index].quantity++;
@@ -42,26 +82,88 @@
     }
   }
 
-  function submit_form(event: Event) {
+  function goToProductList() {
+    localStorage.setItem("formData", JSON.stringify({
+      customerName,
+      contact,
+      address
+    }));
+    localStorage.setItem("selectedProducts", JSON.stringify(products));
+    goto('/product-list');
+  }
+
+  async function submit_form(event: Event) {
     event.preventDefault();
-    if (confirm("คุณต้องการจะส่งข้อมูลใช่ไหม")) {
-      console.log({
-        customerName,
-        contact,
-        address,
-        selectedStaff,
-        products,
+
+    if (
+      customerName.trim() === '' ||
+      contact.trim() === '' ||
+      address.trim() === '' ||
+      products.length === 0
+    ) {
+      showError([
+        "❌ ไม่สามารถส่งข้อมูลได้ เนื่องจาก:",
+        customerName.trim() === '' ? "- ชื่อลูกค้าไม่ครบ" : '',
+        contact.trim() === '' ? "- ช่องทางติดต่อไม่ครบ" : '',
+        address.trim() === '' ? "- ที่อยู่ไม่ครบ" : '',
+        products.length === 0 ? "- ยังไม่ได้เลือกสินค้า" : ''
+      ].filter(Boolean).join("\n"));
+      return;
+    }
+
+    for (const product of products) {
+      if (!product.categoryId) {
+        showError(`❌ ไม่พบ categoryId ของสินค้า "${product.name}" (ID: ${product.productId}) กรุณากลับไปเลือกสินค้าใหม่`);
+        return;
+      }
+    }
+
+    if (!confirm("คุณต้องการจะส่งข้อมูลใช่ไหม")) return;
+
+    const payload = {
+      customerName,
+      contact,
+      address,
+      selectedStaff,
+      submittedAt: new Date().toISOString(),
+      products: products.map(p => ({
+        productId: p.productId,
+        name: p.name,
+        quantity: p.quantity,
+        categoryId: p.categoryId
+      }))
+    };
+
+    try {
+      const res = await fetch('https://l6xfm55xkf.execute-api.us-east-1.amazonaws.com/submit-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-      window.location.href = '/home';
-    } else {
-      console.log('คุณยกเลิกเรียบร้อยแล้ว');
+
+      if (res.ok) {
+        alert("✅ ส่งข้อมูลสำเร็จ");
+        goto('/home');
+      } else {
+        const error = await res.json();
+        showError(`❌ เกิดข้อผิดพลาด: ${error.error}`);
+      }
+    } catch (err) {
+      console.error("❌ Fetch error:", err);
+      showError("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ได้\nโปรดลองใหม่ภายหลัง");
     }
   }
 </script>
 
+
+
+
 <Menubar />
 <main class="main-content">
   <div class="content">
+    {#if errorMessage}
+      <div class="alert">{errorMessage}</div>
+    {/if}
     <div class="form_container">
       <form on:submit={submit_form}>
         <h2>กรอกข้อมูลลูกค้า</h2>
@@ -70,12 +172,13 @@
         <input type="text" id="name" bind:value={customerName} required />
 
         <label for="contact">ช่องทางติดต่อ</label>
-        <input type="tel" id="contact" bind:value={contact} />
+        <input type="tel" id="contact" bind:value={contact} required />
 
         <label for="address">ที่อยู่</label>
         <textarea id="address" bind:value={address} rows="3" required></textarea>
 
         <label>รายการสินค้า</label>
+
         {#each products as product, index}
           <div class="product-row">
             <span class="product-name">{product.name}</span>
@@ -88,7 +191,7 @@
           </div>
         {/each}
 
-        <button type="button" on:click={() => goto('/product-list')}>เพิ่มสินค้า</button>
+        <button type="button" on:click={goToProductList}>เพิ่มสินค้า</button>
 
         <label for="staff">พนักงาน</label>
         <input type="text" id="staff" value={loggedInUserName} readonly class="readonly-input" />
@@ -114,6 +217,16 @@
   .content {
     flex: 1;
     padding: 60px;
+  }
+
+  .alert {
+    background-color: #fdecea;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-weight: bold;
   }
 
   .form_container {

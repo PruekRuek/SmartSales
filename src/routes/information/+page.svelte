@@ -3,6 +3,7 @@
   import { onMount, tick } from 'svelte';
   import { page } from '$app/stores';
   import { get } from 'svelte/store';
+  import { goto } from '$app/navigation';
 
   let product: any = null;
   let pdfContentRef: HTMLElement;
@@ -21,7 +22,7 @@
 
   async function exportPDF() {
     isGeneratingPDF = true;
-    await tick(); // รอ DOM อัปเดตซ่อนรูปภาพ
+    await tick();
     // @ts-ignore: html2pdf มาจาก CDN
     html2pdf().from(pdfContentRef).set({
       filename: `${product?.name || 'product'}.pdf`,
@@ -30,6 +31,12 @@
       isGeneratingPDF = false;
     });
   }
+
+  function addToForm() {
+    if (product?.productId && product?.quantity > 0) {
+      goto(`/form?id=${product.productId}`);
+    }
+  }
 </script>
 
 <Menubar />
@@ -37,9 +44,7 @@
 <main>
   {#if product}
     <div class="product-container" bind:this={pdfContentRef}>
-      
       {#if !isGeneratingPDF}
-        <!-- แสดงเฉพาะบนเว็บ -->
         <div class="image-section">
           <div class="image-box">
             <img src={product.imageUrl} alt={product.name} class="product-image" />
@@ -56,8 +61,12 @@
         <p class="product-description">warranty: {product.info?.warranty || 'ไม่มีข้อมูลเพิ่มเติม'}</p>
       </div>
     </div>
-
+    
+    <button class="form-button" on:click={addToForm} disabled={product.quantity === 0}>
+      {product.quantity === 0 ? 'สินค้าหมด' : 'ออเดอร์สินค้า'}
+    </button>
     <button class="pdf-button" on:click={exportPDF}>ดาวน์โหลด PDF</button>
+    
   {:else}
     <p>Loading product...</p>
   {/if}
@@ -120,8 +129,10 @@
     color: #555;
   }
 
-  .pdf-button {
+  .pdf-button,
+  .form-button {
     margin-top: 10px;
+    margin-right: 10px;
     padding: 10px 20px;
     background-color: #0077cc;
     color: white;
@@ -129,5 +140,14 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+  }
+
+  .form-button {
+    background-color: #10b981;
+  }
+
+  .form-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 </style>
