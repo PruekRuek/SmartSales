@@ -9,7 +9,7 @@
     <!-- Card 1 -->
     <a href="/tracksales" class="link">
     <button class="card">
-      <img src="src/lib/images/sales_status.png" alt="ติดตามสถานะการขาย" class="icon" />
+      <img src="/images/sales_status.png" alt="ติดตามสถานะการขาย" class="icon" />
       <p>ติดตามสถานะการขาย</p>
     </button>
     </a>
@@ -17,7 +17,7 @@
     <!-- Card 2 -->
     <a href="/clientseller" class="link">
     <button class="card">
-      <img src="src/lib/images/sales_customer.png" alt="เช็คประวัติลูกค้า" class="icon" />
+      <img src="/images/sales_customer.png" alt="เช็คประวัติลูกค้า" class="icon" />
       <p>เซลล์ประจำลูกค้า</p>
     </button>
   </div>

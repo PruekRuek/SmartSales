@@ -7,7 +7,7 @@
   </script>
   
 <main>
-    <img src="src/lib/images/logo.png">
+    <img src="/images/logo.png">
     <button on:click={login}>Go to Login</button>
 </main>
 
